@@ -7,6 +7,10 @@
     <title>Document</title>
 
     <style>
+
+        body{
+            background-color: rgb(92, 92, 92);
+        }
         .noSelect {
 
             user-select: none;
@@ -32,7 +36,7 @@
         }
 
         .yellow {
-            background-color: yellow;
+            background-color: rgb(201, 201, 34);
         }
         
         .blue {
@@ -41,13 +45,21 @@
         .shape{
             width: 100px;
             height: 100px;
+            opacity: 50%;
+        }
+        .blink{
+            opacity: 100%;
         }
         .stil{
             display: grid;
+         
             grid-template-columns: 1fr 1fr;
             height: 500px;
             width: 500px;
             margin: auto;
+        }
+        .wrong {
+            background-color: red;
         }
 
     </style>
@@ -59,14 +71,19 @@
 
 
     <script>
-        
+            
         //Model
         let btnArray=['red','yellow','blue','green'];
         let memoryArray = [];
+        let buttonBlink=['','','','']
         let memoryArrayCounter = 0;
         let userArray = [];
         let matchingArrays;
-        let level=0;
+        let userIndex=0;
+        let level = 0;
+        let errorBlink= 'red';
+        let counter = 0;
+        
         //View
         show()
         function show(){
@@ -74,10 +91,13 @@
             let buttons='';
             for (let i = 0; i < btnArray.length; i++) {
                 buttons += `
-                <div class="${btnArray[i]} shape" onclick="userSelect(${i})"></div>
+                <div class="${btnArray[i]} ${buttonBlink[i]} shape" onclick="userSelect(${i})"></div>
                 `;
             }
-            html += `<div class="stil">${buttons}</div>`;
+            html += `<div class="stil">${buttons}</div>
+            <button onclick="startGame()">Start</button>
+            <div>Level: ${level}</div
+            `;
             
             document.getElementById("app").innerHTML = html;
         }
@@ -87,19 +107,54 @@
         function newMemory(){
             var temp = Math.floor((Math.random() * btnArray.length));
             memoryArray.push(btnArray[temp])
+            buttonBlink[temp]='blink';
+            show();
+            setTimeout(function () {
+                buttonBlink[temp]='';
+                show()
+            },300);
         }
-
         function userSelect(index){
             userArray.push(btnArray[index])
+            buttonBlink[index]='blink';
+            show()
+            setTimeout(function () {
+                buttonBlink[index]='';
+                show()
+            },100);
             checkWinner()
-            level++;
+            
         }
-
-        function checkWinner(){
-            if(memoryArray[level] == userArray[level]){
-                console.log('winner')
+        function startGame(){
+           if (counter == 0){
+                setTimeout(newMemory, 400) 
+                counter++;
             }
-            else console.log('LOSER')
+            
+            
+            
+        }
+        function checkWinner(){
+            if(memoryArray[userIndex] == userArray[userIndex]){
+                userIndex++;
+                if(memoryArray.length == userArray.length){
+                    level++;
+                    userArray = [];
+                    userIndex = 0;
+                    setTimeout(newMemory, 400);
+                }
+            }
+            else {
+                level = 0;
+                memoryArray = [];
+                userArray = [];
+                userIndex=0;
+                document.querySelector('body').classList.add('wrong');
+                setTimeout(function () {
+                    document.querySelector('body').classList.remove('wrong');
+                },200);
+                counter = 0;
+            }
         }
 
 
